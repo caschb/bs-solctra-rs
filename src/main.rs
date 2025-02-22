@@ -1,4 +1,4 @@
-use clap::{error::Result, Parser};
+use clap::{Parser, error::Result};
 use log::{debug, info, trace};
 use std::{
     fs::{self, DirBuilder, File},
@@ -7,11 +7,10 @@ use std::{
 };
 
 #[derive(Debug)]
-struct Point
-{
-    x:f64, 
-    y:f64, 
-    z:f64
+struct Point {
+    x: f64,
+    y: f64,
+    z: f64,
 }
 
 impl Point {
@@ -36,16 +35,16 @@ fn read_from_file(path: &Path) -> Vec<Point> {
             Err(_) => panic!("Error reading line from file {}", path.display()),
         };
         let parts = vals.split("\t");
-        let parsed_parts: Vec<f64> = parts.map(|line|{
-            match line.trim().parse::<f64>() {
+        let parsed_parts: Vec<f64> = parts
+            .map(|line| match line.trim().parse::<f64>() {
                 Ok(value) => value,
                 Err(_) => panic!("Error parsing string: {}", line),
-            }
-        }).collect();
+            })
+            .collect();
         let x = parsed_parts[0];
         let y = parsed_parts[1];
         let z = parsed_parts[2];
-        let point = Point{x, y, z};
+        let point = Point { x, y, z };
         trace!("{}: {:?}", path.display(), point);
         points.push(point);
     }
@@ -126,27 +125,34 @@ fn simulate_particles(particles: Vec<Point>, total_steps: u32, step_size: f64) {
     }
 }
 
-fn read_coil_data_directory(path: &Path) -> Vec::<Vec::<Point>> {
-   let mut coil_files = fs::read_dir(path).expect("Error reading file")
-   .map(|res| res.map(|e| e.path()))
-   .collect::<Result<Vec<_>, io::Error>>().unwrap();
-   coil_files.sort();
+fn read_coil_data_directory(path: &Path) -> Vec<Vec<Point>> {
+    let mut coil_files = fs::read_dir(path)
+        .expect("Error reading file")
+        .map(|res| res.map(|e| e.path()))
+        .collect::<Result<Vec<_>, io::Error>>()
+        .unwrap();
+    coil_files.sort();
 
-   let mut coils = Vec::<Vec::<Point>>::new();
+    let mut coils = Vec::<Vec<Point>>::new();
 
-   for coil_file in coil_files {
+    for coil_file in coil_files {
         let data = read_from_file(&coil_file.as_path());
         coils.push(data);
-   };
-   debug!("Read {} coils", coils.len());
-   return coils;
+    }
+    debug!("Read {} coils", coils.len());
+    return coils;
 }
 
-fn compute_e_roof(coils: &Vec::<Vec::<Point>>) -> Vec<Vec<Point>> {
-    let mut e_roof = Vec::<Vec::<Point>>::new();
-    let mut segment = Point { x: 0.0, y: 0.0, z: 0.0 };
+fn compute_e_roof(coils: &Vec<Vec<Point>>) -> Vec<Vec<Point>> {
+    let mut e_roof = Vec::<Vec<Point>>::new();
+    let mut segment = Point {
+        x: 0.0,
+        y: 0.0,
+        z: 0.0,
+    };
     for (i, coil) in coils.iter().enumerate() {
-        for degree in 0..coil.len()-1 {
+        e_roof.push(Vec::<Point>::new());
+        for degree in 0..coil.len() - 1 {
             segment.x = coil[degree + 1].x - coil[degree].x;
             segment.y = coil[degree + 1].y - coil[degree].y;
             segment.z = coil[degree + 1].z - coil[degree].z;
@@ -155,8 +161,8 @@ fn compute_e_roof(coils: &Vec::<Vec::<Point>>) -> Vec<Vec<Point>> {
             let x = segment.x / length_segment;
             let y = segment.y / length_segment;
             let z = segment.z / length_segment;
-            // FIXME: I think vectors don't work like this
-            e_roof[i].push(Point { x, y ,z });
+            trace!("{} e_roof: {}, {}, {}", i, x, y, z);
+            e_roof[i].push(Point { x, y, z });
         }
     }
     return e_roof;
