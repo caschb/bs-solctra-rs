@@ -3,7 +3,6 @@ use constants::{MAJOR_RADIUS, MINOR_RADIUS};
 use log::{debug, info, trace};
 use point::{Point, Points};
 use std::{
-    fmt::format,
     fs::{self, DirBuilder, File},
     io::{self, BufRead, BufReader, Write},
     path::{Path, PathBuf},
