@@ -201,9 +201,14 @@ fn simulate_step(
         z: particle.z + (k1.z + 2.0 * k2.z + 2.0 * k3.z + k4.z) / 6.0,
     };
 
+    let p = Point {
+        x: result.x,
+        y: result.y,
+        z: 0.0,
+    };
     let origin = Point {
-        x: MAJOR_RADIUS * result.x / result.get_norm(),
-        y: MAJOR_RADIUS * result.y / result.get_norm(),
+        x: MAJOR_RADIUS * p.x / p.get_norm(),
+        y: MAJOR_RADIUS * p.y / p.get_norm(),
         z: 0.0,
     };
 
@@ -244,7 +249,7 @@ fn simulate_particles(
                 *particle = simulate_step(particle, coils, displacements, e_roof, step_size);
             }
         }
-        if step % 10 == 0 {
+        if step % 1 == 0 {
             write_points_to_file(&particles, output_dir, step);
         }
     }
@@ -329,8 +334,13 @@ fn main() {
 
     info!("Reading coil data from directory: {}", &args.resource_path);
     let coils = read_coil_data_directory(Path::new(&args.resource_path));
+    info!("Computing displacements");
     let displacements = compute_all_displacements(&coils);
+    info!("Computing e_roof");
     let e_roof = compute_all_e_roof(&displacements);
+    debug!("Total e_roof: {}", e_roof.len());
+
+    trace!("{:?}", e_roof);
 
     simulate_particles(
         particles.as_mut_slice(),
