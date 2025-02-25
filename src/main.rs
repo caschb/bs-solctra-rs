@@ -8,6 +8,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
+mod args;
 mod constants;
 mod point;
 
@@ -42,58 +43,6 @@ fn read_from_file(path: &Path) -> Points {
     }
     debug!("Read {} points from {}", points.len(), path.display());
     return points;
-}
-
-#[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
-struct Args {
-    /// Path to resource folder
-    #[arg(long)]
-    resource_path: String,
-
-    /// Particles file
-    #[arg(long)]
-    particles_file: String,
-
-    /// Total simulation steps
-    #[arg(long, default_value_t = 10000)]
-    steps: u32,
-
-    /// Size of time step
-    #[arg(long, default_value_t = 0.001)]
-    step_size: f64,
-
-    /// Precision to use
-    #[arg(long, default_value_t = 5)]
-    precision: u8,
-
-    /// Total particles to use
-    #[arg(long, default_value_t = 1)]
-    length: u32,
-
-    /// Mode to run
-    #[arg(long, default_value_t = 1)]
-    mode: u8,
-
-    /// Magnetic profile
-    #[arg(long, default_value_t = 0)]
-    magprof: u8,
-
-    /// Total points
-    #[arg(long, default_value_t = 10000)]
-    num_points: u32,
-
-    /// Phi angle
-    #[arg(long, default_value_t = 0)]
-    phi_angle: u32,
-
-    /// Dimension
-    #[arg(long, default_value_t = 1)]
-    dimension: u8,
-
-    /// Output directory
-    #[arg(long)]
-    output: String,
 }
 
 fn create_directory(path: &Path) {
@@ -138,9 +87,9 @@ fn compute_magnetic_field(
                 y: rmi_a.y * c,
                 z: rmi_a.z * c,
             };
-            bx = bx + (u.y * v.z) - (u.z * v.y);
-            by = by + (u.z * v.x) + (u.x * v.z);
-            bz = bz + (u.x * v.y) - (u.y * v.x);
+            bx = bx + ((u.y * v.z) - (u.z * v.y));
+            by = by - ((u.x * v.z) - (u.z * v.x));
+            bz = bz + ((u.x * v.y) - (u.y * v.x));
         }
     }
     let b = Point {
@@ -249,7 +198,7 @@ fn simulate_particles(
                 *particle = simulate_step(particle, coils, displacements, e_roof, step_size);
             }
         }
-        if step % 1 == 0 {
+        if step % 10 == 0 {
             write_points_to_file(&particles, output_dir, step);
         }
     }
@@ -318,9 +267,9 @@ fn write_points_to_file(particles: &[Point], output_dir: &Path, step: u32) {
 }
 
 fn main() {
-    let args = Args::parse();
     env_logger::init();
     info!("Starting BS-Solctra");
+    let args = args::Args::parse();
     debug!("{:?}", args);
     let output_dir = Path::new(&args.output);
 
