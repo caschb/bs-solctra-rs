@@ -45,11 +45,11 @@ impl fmt::Display for Point {
     }
 }
 
-pub(crate) fn read_from_file(path: &Path) -> Result<Vec<Point>, Box<dyn Error>> {
+pub(crate) fn read_from_file(path: &Path, max_items: usize) -> Result<Vec<Point>, Box<dyn Error>> {
     debug!("Reading data from file {:?}", path);
     let mut rdr = csv::Reader::from_path(path)?;
     let mut points = Vec::<Point>::new();
-    for result in rdr.deserialize() {
+    for result in rdr.deserialize().take(max_items) {
         let point: Point = result?;
         points.push(point);
     }

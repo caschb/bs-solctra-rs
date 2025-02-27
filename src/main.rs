@@ -30,7 +30,8 @@ fn main() {
         Err(_) => panic!("Error querying path"),
     }
     info!("Reading particles from file {}", args.particles_file);
-    let mut particles = match read_from_file(Path::new(&args.particles_file)) {
+    let max_particles = args.num_particles;
+    let mut particles = match read_from_file(Path::new(&args.particles_file), max_particles) {
         Ok(particles) => particles,
         Err(err) => panic!("Error: {}", err),
     };

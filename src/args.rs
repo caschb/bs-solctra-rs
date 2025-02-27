@@ -35,8 +35,8 @@ pub(crate) struct Args {
     pub(crate) magprof: u8,
 
     /// Total points
-    #[arg(long, default_value_t = 10000)]
-    pub(crate) num_points: u32,
+    #[arg(long, default_value_t = usize::MAX)]
+    pub(crate) num_particles: usize,
 
     /// Phi angle
     #[arg(long, default_value_t = 0)]

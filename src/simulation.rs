@@ -4,7 +4,7 @@ use crate::{
 };
 use clap::error::Result;
 use log::debug;
-use std::{fs, io, path::Path, error::Error};
+use std::{error::Error, fs, io, path::Path, usize};
 
 pub(crate) fn compute_magnetic_field(
     particle: &Point,
@@ -174,7 +174,7 @@ pub(crate) fn read_coil_data_directory(path: &Path) -> Result<Vec<Vec<Point>>, B
     let mut coils = Vec::<Vec<Point>>::new();
 
     for coil_file in coil_files {
-        let data = read_from_file(&coil_file.as_path())?;
+        let data = read_from_file(&coil_file.as_path(), usize::MAX)?;
         coils.push(data);
     }
     debug!("Read {} coils", coils.len());
