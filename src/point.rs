@@ -1,10 +1,12 @@
 use core::fmt;
-use log::{debug, trace};
+use csv;
+use log::debug;
 use std::fs::File;
-use std::io::{BufRead, BufReader, Write};
+use std::io::Write;
 use std::path::{Path, PathBuf};
+use std::error::Error;
 
-#[derive(Debug, Default, PartialEq, Clone, Copy)]
+#[derive(Debug, Default, PartialEq, Clone, Copy, serde::Deserialize)]
 pub(crate) struct Point {
     pub(crate) x: f64,
     pub(crate) y: f64,
@@ -45,37 +47,16 @@ impl fmt::Display for Point {
     }
 }
 
-pub(crate) fn read_from_file(path: &Path) -> Vec<Point> {
+pub(crate) fn read_from_file(path: &Path) -> Result<Vec<Point>, Box<dyn Error>> {
     debug!("Reading data from file {:?}", path);
-    let file = match File::open(path) {
-        Ok(f) => f,
-        Err(_) => panic!("File {} not found!", path.display()),
-    };
-    let reader = BufReader::new(file);
-    let lines = reader.lines();
-
+    let mut rdr = csv::Reader::from_path(path)?;
     let mut points = Vec::<Point>::new();
-    for line in lines {
-        let vals = match line {
-            Ok(values) => values,
-            Err(_) => panic!("Error reading line from file {}", path.display()),
-        };
-        let parts = vals.split("\t");
-        let parsed_parts: Vec<f64> = parts
-            .map(|line| match line.trim().parse::<f64>() {
-                Ok(value) => value,
-                Err(_) => panic!("Error parsing string: {}", line),
-            })
-            .collect();
-        let x = parsed_parts[0];
-        let y = parsed_parts[1];
-        let z = parsed_parts[2];
-        let point = Point { x, y, z };
-        trace!("{}: {:?}", path.display(), point);
+    for result in rdr.deserialize() {
+        let point: Point = result?;
         points.push(point);
     }
-    debug!("Read {} points from {}", points.len(), path.display());
-    return points;
+    debug!("Read {} points from file {:?}", points.len(), path);
+    return Ok(points);
 }
 
 pub(crate) fn write_points_to_file(particles: &[Point], output_dir: &Path, step: u32) {

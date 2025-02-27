@@ -30,10 +30,16 @@ fn main() {
         Err(_) => panic!("Error querying path"),
     }
     info!("Reading particles from file {}", args.particles_file);
-    let mut particles = read_from_file(Path::new(&args.particles_file));
+    let mut particles = match read_from_file(Path::new(&args.particles_file)) {
+        Ok(particles) => particles,
+        Err(err) => panic!("Error: {}", err),
+    };
 
     info!("Reading coil data from directory: {}", &args.resource_path);
-    let coils = simulation::read_coil_data_directory(Path::new(&args.resource_path));
+    let coils = match simulation::read_coil_data_directory(Path::new(&args.resource_path)){
+        Ok(coils) => coils,
+        Err(err) => panic!("Error: {}", err),
+    };
     info!("Computing displacements");
     let displacements = simulation::compute_all_displacements(&coils);
     info!("Computing e_roof");

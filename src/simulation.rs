@@ -4,7 +4,7 @@ use crate::{
 };
 use clap::error::Result;
 use log::debug;
-use std::{fs, io, path::Path};
+use std::{fs, io, path::Path, error::Error};
 
 pub(crate) fn compute_magnetic_field(
     particle: &Point,
@@ -156,7 +156,7 @@ pub(crate) fn simulate_particles(
     }
 }
 
-pub(crate) fn read_coil_data_directory(path: &Path) -> Vec<Vec<Point>> {
+pub(crate) fn read_coil_data_directory(path: &Path) -> Result<Vec<Vec<Point>>, Box<dyn Error>> {
     let mut coil_files = fs::read_dir(path)
         .expect("Error reading file")
         .map(|res| res.map(|e| e.path()))
@@ -167,11 +167,11 @@ pub(crate) fn read_coil_data_directory(path: &Path) -> Vec<Vec<Point>> {
     let mut coils = Vec::<Vec<Point>>::new();
 
     for coil_file in coil_files {
-        let data = read_from_file(&coil_file.as_path());
+        let data = read_from_file(&coil_file.as_path())?;
         coils.push(data);
     }
     debug!("Read {} coils", coils.len());
-    return coils;
+    return Ok(coils);
 }
 
 pub(crate) fn compute_displacements(coil: &[Point]) -> Vec<Point> {
