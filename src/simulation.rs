@@ -13,9 +13,7 @@ pub(crate) fn compute_magnetic_field(
     e_roof: &Vec<Vec<Point>>,
 ) -> Point {
     let multiplier = (MIU * I) / (4.0 * PI);
-    let mut bx = 0.0;
-    let mut by = 0.0;
-    let mut bz = 0.0;
+    let mut b = Point{ x: 0.0, y: 0.0, z: 0.0 };
 
     for coil_idx in 0..coils.len() {
         for point_idx in 0..coils[coil_idx].len() - 1 {
@@ -39,16 +37,11 @@ pub(crate) fn compute_magnetic_field(
                 y: rmi_a.y * c,
                 z: rmi_a.z * c,
             };
-            bx = bx + ((u.y * v.z) - (u.z * v.y));
-            by = by - ((u.x * v.z) - (u.z * v.x));
-            bz = bz + ((u.x * v.y) - (u.y * v.x));
+            b.x = b.x + ((u.y * v.z) - (u.z * v.y));
+            b.y = b.y - ((u.x * v.z) - (u.z * v.x));
+            b.z = b.z + ((u.x * v.y) - (u.y * v.x));
         }
     }
-    let b = Point {
-        x: bx,
-        y: by,
-        z: bz,
-    };
     b
 }
 
