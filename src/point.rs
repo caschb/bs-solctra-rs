@@ -66,7 +66,6 @@ pub(crate) fn write_points_to_file(
     path.push(output_dir);
     path.push(format!("out_{}.csv", step));
     let mut wtr = csv::Writer::from_path(path)?;
-    // let mut wtr = csv::Writer::from_writer(vec![]);
     for point in points {
         wtr.serialize(point)?;
     }
