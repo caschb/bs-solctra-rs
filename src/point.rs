@@ -1,12 +1,10 @@
 use core::fmt;
 use csv;
 use log::debug;
-use std::fs::File;
-use std::io::Write;
-use std::path::{Path, PathBuf};
 use std::error::Error;
+use std::path::{Path, PathBuf};
 
-#[derive(Debug, Default, PartialEq, Clone, Copy, serde::Deserialize)]
+#[derive(Debug, Default, PartialEq, Clone, Copy, serde::Deserialize, serde::Serialize)]
 pub(crate) struct Point {
     pub(crate) x: f64,
     pub(crate) y: f64,
@@ -59,22 +57,18 @@ pub(crate) fn read_from_file(path: &Path) -> Result<Vec<Point>, Box<dyn Error>> 
     return Ok(points);
 }
 
-pub(crate) fn write_points_to_file(particles: &[Point], output_dir: &Path, step: u32) {
+pub(crate) fn write_points_to_file(
+    points: &[Point],
+    output_dir: &Path,
+    step: u32,
+) -> Result<(), Box<dyn Error>> {
     let mut path = PathBuf::new();
     path.push(output_dir);
     path.push(format!("out_{}.csv", step));
-    let mut f = match File::create(path) {
-        Ok(f) => f,
-        Err(_) => panic!("Error creating file"),
-    };
-    f.write(b"x,y,z\n").unwrap();
-    f.write(
-        particles
-            .iter()
-            .map(|part| part.to_string())
-            .collect::<Vec<_>>()
-            .join("\n")
-            .as_bytes(),
-    )
-    .unwrap();
+    let mut wtr = csv::Writer::from_path(path)?;
+    // let mut wtr = csv::Writer::from_writer(vec![]);
+    for point in points {
+        wtr.serialize(point)?;
+    }
+    Ok(())
 }

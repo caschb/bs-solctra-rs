@@ -141,7 +141,11 @@ pub(crate) fn simulate_particles(
 
     debug!("Total particles: {}", length);
 
-    write_points_to_file(&particles, output_dir, 0);
+    match write_points_to_file(&particles, output_dir, 0) 
+    {
+        Ok(_) => debug!("Wrote points to {:?}", output_dir),
+        Err(error) => panic!("Error writing points to file. {}", error)
+    };
     for step in 1..total_steps + 1 {
         for particle in &mut *particles {
             if *particle == divergent_particle {
@@ -151,7 +155,10 @@ pub(crate) fn simulate_particles(
             }
         }
         if step % 10 == 0 {
-            write_points_to_file(&particles, output_dir, step);
+            match write_points_to_file(&particles, output_dir, step) {
+                Ok(_) => debug!("Wrote points to {:?}", output_dir),
+                Err(error) => panic!("Error writing points to file. {}", error)
+            };
         }
     }
 }
