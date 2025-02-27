@@ -3,11 +3,11 @@ use clap::Parser;
 #[command(version, about, long_about = None)]
 pub(crate) struct Args {
     /// Path to resource folder
-    #[arg(long)]
+    #[arg(short, long)]
     pub(crate) resource_path: String,
 
     /// Particles file
-    #[arg(long)]
+    #[arg(short, long)]
     pub(crate) particles_file: String,
 
     /// Total simulation steps
@@ -47,6 +47,6 @@ pub(crate) struct Args {
     pub(crate) dimension: u8,
 
     /// Output directory
-    #[arg(long)]
+    #[arg(short, long)]
     pub(crate) output: String,
 }
