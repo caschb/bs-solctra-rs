@@ -7,7 +7,6 @@ pub(crate) struct Point {
     pub(crate) z: f64,
 }
 
-pub(crate) type Points = Vec<Point>;
 impl Point {
     pub(crate) fn get_norm(&self) -> f64 {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()

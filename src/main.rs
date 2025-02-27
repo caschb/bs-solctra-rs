@@ -1,7 +1,7 @@
 use clap::{Parser, error::Result};
 use constants::{MAJOR_RADIUS, MINOR_RADIUS};
 use log::{debug, info, trace};
-use point::{Point, Points};
+use point::Point;
 use std::{
     fs::{self, DirBuilder, File},
     io::{self, BufRead, BufReader, Write},
@@ -12,7 +12,7 @@ mod args;
 mod constants;
 mod point;
 
-fn read_from_file(path: &Path) -> Points {
+fn read_from_file(path: &Path) -> Vec<Point>{
     debug!("Reading data from file {:?}", path);
     let file = match File::open(path) {
         Ok(f) => f,
@@ -56,9 +56,9 @@ fn create_directory(path: &Path) {
 
 fn compute_magnetic_field(
     particle: &Point,
-    coils: &Vec<Points>,
-    displacements: &Vec<Points>,
-    e_roof: &Vec<Points>,
+    coils: &Vec<Vec<Point>>,
+    displacements: &Vec<Vec<Point>>,
+    e_roof: &Vec<Vec<Point>>,
 ) -> Point {
     let multiplier = (constants::MIU * constants::I) / (4.0 * constants::PI);
     let mut bx = 0.0;
@@ -102,9 +102,9 @@ fn compute_magnetic_field(
 
 fn simulate_step(
     particle: &Point,
-    coils: &Vec<Points>,
-    displacements: &Vec<Points>,
-    e_roof: &Vec<Points>,
+    coils: &Vec<Vec<Point>>,
+    displacements: &Vec<Vec<Point>>,
+    e_roof: &Vec<Vec<Point>>,
     step_size: f64,
 ) -> Point {
     let mut k1 = compute_magnetic_field(particle, coils, displacements, e_roof);
@@ -175,9 +175,9 @@ fn simulate_particles(
     particles: &mut [Point],
     total_steps: u32,
     step_size: f64,
-    coils: &Vec<Points>,
-    displacements: &Vec<Points>,
-    e_roof: &Vec<Points>,
+    coils: &Vec<Vec<Point>>,
+    displacements: &Vec<Vec<Point>>,
+    e_roof: &Vec<Vec<Point>>,
     output_dir: &Path,
 ) {
     let length = particles.len();
@@ -204,7 +204,7 @@ fn simulate_particles(
     }
 }
 
-fn read_coil_data_directory(path: &Path) -> Vec<Points> {
+fn read_coil_data_directory(path: &Path) -> Vec<Vec<Point>> {
     let mut coil_files = fs::read_dir(path)
         .expect("Error reading file")
         .map(|res| res.map(|e| e.path()))
@@ -212,7 +212,7 @@ fn read_coil_data_directory(path: &Path) -> Vec<Points> {
         .unwrap();
     coil_files.sort();
 
-    let mut coils = Vec::<Points>::new();
+    let mut coils = Vec::<Vec<Point>>::new();
 
     for coil_file in coil_files {
         let data = read_from_file(&coil_file.as_path());
@@ -222,24 +222,24 @@ fn read_coil_data_directory(path: &Path) -> Vec<Points> {
     return coils;
 }
 
-fn compute_displacements(coil: &[Point]) -> Points {
+fn compute_displacements(coil: &[Point]) -> Vec<Point>{
     coil.windows(2)
         .map(|w| w[1].get_displacement(&w[0]))
         .collect()
 }
 
-fn compute_all_displacements(coils: &Vec<Points>) -> Vec<Points> {
+fn compute_all_displacements(coils: &Vec<Vec<Point>>) -> Vec<Vec<Point>> {
     coils.iter().map(|c| compute_displacements(c)).collect()
 }
 
-fn compute_e_roof(coil_displacements: &[Point]) -> Points {
+fn compute_e_roof(coil_displacements: &[Point]) -> Vec<Point>{
     coil_displacements
         .iter()
         .map(|disp| disp.get_unit_vector())
         .collect()
 }
 
-fn compute_all_e_roof(all_displacements: &Vec<Points>) -> Vec<Points> {
+fn compute_all_e_roof(all_displacements: &Vec<Vec<Point>>) -> Vec<Vec<Point>> {
     all_displacements
         .iter()
         .map(|disps| compute_e_roof(disps))
