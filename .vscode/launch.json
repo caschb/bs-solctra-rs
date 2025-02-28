@@ -7,13 +7,52 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Cargo launch",
+            "name": "Cargo debug launch",
             "cargo": {
                 "args": [
                     "build"
                 ]
             },
-            "args": ["--resource-path", "./resources", "--output", "./output", "--particles-file", "./input_1000.txt"]
+            "env": {
+                "RUST_LOG": "debug"
+            },
+            "args": [
+                "--resource-path",
+                "./tests/test-resources/resources",
+                "--output",
+                "./output",
+                "--particles-file",
+                "./tests/test-resources/input_1000.csv",
+                "--steps",
+                "100"
+            ]
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Cargo relwithdebinfo launch",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--profile",
+                    "relwithdebinfo"
+                ]
+            },
+            "env": {
+                "RUST_LOG": "debug"
+            },
+            "args": [
+                "--resource-path",
+                "./tests/test-resources/resources",
+                "--output",
+                "./output",
+                "--particles-file",
+                "./tests/test-resources/input_1000.csv",
+                "--steps",
+                "100",
+                "--num-particles",
+                "10"
+            ]
         },
     ]
 }
