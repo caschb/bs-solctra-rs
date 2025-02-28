@@ -1,52 +1,53 @@
 use clap::Parser;
+
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
-pub(crate) struct Args {
+pub struct Args {
     /// Path to resource folder
     #[arg(short, long)]
-    pub(crate) resource_path: String,
+    pub resource_path: String,
 
     /// Particles file
     #[arg(short, long)]
-    pub(crate) particles_file: String,
+    pub particles_file: String,
 
     /// Total simulation steps
     #[arg(long, default_value_t = 10000)]
-    pub(crate) steps: u32,
+    pub steps: u32,
 
     /// Size of time step
     #[arg(long, default_value_t = 0.001)]
-    pub(crate) step_size: f64,
+    pub step_size: f64,
 
     /// Precision to use
     #[arg(long, default_value_t = 5)]
-    pub(crate) precision: u8,
+    pub precision: u8,
 
     /// Total particles to use
     #[arg(long, default_value_t = 1)]
-    pub(crate) length: u32,
+    pub length: u32,
 
     /// Mode to run
     #[arg(long, default_value_t = 1)]
-    pub(crate) mode: u8,
+    pub mode: u8,
 
     /// Magnetic profile
     #[arg(long, default_value_t = 0)]
-    pub(crate) magprof: u8,
+    pub magprof: u8,
 
     /// Total points
     #[arg(long, default_value_t = usize::MAX)]
-    pub(crate) num_particles: usize,
+    pub num_particles: usize,
 
     /// Phi angle
     #[arg(long, default_value_t = 0)]
-    pub(crate) phi_angle: u32,
+    pub phi_angle: u32,
 
     /// Dimension
     #[arg(long, default_value_t = 1)]
-    pub(crate) dimension: u8,
+    pub dimension: u8,
 
     /// Output directory
     #[arg(short, long)]
-    pub(crate) output: String,
+    pub output: String,
 }

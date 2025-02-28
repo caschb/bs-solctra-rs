@@ -6,14 +6,22 @@ use clap::error::Result;
 use log::debug;
 use std::{error::Error, fs, io, path::Path, usize};
 
-pub(crate) fn compute_magnetic_field(
+pub fn add_one(other: u32) -> u32 {
+    other + 1
+}
+
+pub fn compute_magnetic_field(
     particle: &Point,
     coils: &Vec<Vec<Point>>,
     displacements: &Vec<Vec<Point>>,
     e_roof: &Vec<Vec<Point>>,
 ) -> Point {
     let multiplier = (MIU * I) / (4.0 * PI);
-    let mut b = Point{ x: 0.0, y: 0.0, z: 0.0 };
+    let mut b = Point {
+        x: 0.0,
+        y: 0.0,
+        z: 0.0,
+    };
 
     for coil_idx in 0..coils.len() {
         for point_idx in 0..coils[coil_idx].len() - 1 {
@@ -45,7 +53,7 @@ pub(crate) fn compute_magnetic_field(
     b
 }
 
-pub(crate) fn simulate_step(
+pub fn simulate_step(
     particle: &Point,
     coils: &Vec<Vec<Point>>,
     displacements: &Vec<Vec<Point>>,
@@ -116,7 +124,7 @@ pub(crate) fn simulate_step(
     result
 }
 
-pub(crate) fn simulate_particles(
+pub fn simulate_particles(
     particles: &mut [Point],
     total_steps: u32,
     step_size: f64,
@@ -134,10 +142,9 @@ pub(crate) fn simulate_particles(
 
     debug!("Total particles: {}", length);
 
-    match write_points_to_file(&particles, output_dir, 0) 
-    {
+    match write_points_to_file(&particles, output_dir, 0) {
         Ok(_) => debug!("Wrote points to {:?}", output_dir),
-        Err(error) => panic!("Error writing points to file. {}", error)
+        Err(error) => panic!("Error writing points to file. {}", error),
     };
     for step in 1..total_steps + 1 {
         for particle in &mut *particles {
@@ -150,13 +157,13 @@ pub(crate) fn simulate_particles(
         if step % 10 == 0 {
             match write_points_to_file(&particles, output_dir, step) {
                 Ok(_) => debug!("Wrote points to {:?}", output_dir),
-                Err(error) => panic!("Error writing points to file. {}", error)
+                Err(error) => panic!("Error writing points to file. {}", error),
             };
         }
     }
 }
 
-pub(crate) fn read_coil_data_directory(path: &Path) -> Result<Vec<Vec<Point>>, Box<dyn Error>> {
+pub fn read_coil_data_directory(path: &Path) -> Result<Vec<Vec<Point>>, Box<dyn Error>> {
     let mut coil_files = fs::read_dir(path)
         .expect("Error reading file")
         .map(|res| res.map(|e| e.path()))
@@ -174,24 +181,24 @@ pub(crate) fn read_coil_data_directory(path: &Path) -> Result<Vec<Vec<Point>>, B
     return Ok(coils);
 }
 
-pub(crate) fn compute_displacements(coil: &[Point]) -> Vec<Point> {
+pub fn compute_displacements(coil: &[Point]) -> Vec<Point> {
     coil.windows(2)
         .map(|w| w[1].get_displacement(&w[0]))
         .collect()
 }
 
-pub(crate) fn compute_all_displacements(coils: &Vec<Vec<Point>>) -> Vec<Vec<Point>> {
+pub fn compute_all_displacements(coils: &Vec<Vec<Point>>) -> Vec<Vec<Point>> {
     coils.iter().map(|c| compute_displacements(c)).collect()
 }
 
-pub(crate) fn compute_e_roof(coil_displacements: &[Point]) -> Vec<Point> {
+pub fn compute_e_roof(coil_displacements: &[Point]) -> Vec<Point> {
     coil_displacements
         .iter()
         .map(|disp| disp.get_unit_vector())
         .collect()
 }
 
-pub(crate) fn compute_all_e_roof(all_displacements: &Vec<Vec<Point>>) -> Vec<Vec<Point>> {
+pub fn compute_all_e_roof(all_displacements: &Vec<Vec<Point>>) -> Vec<Vec<Point>> {
     all_displacements
         .iter()
         .map(|disps| compute_e_roof(disps))

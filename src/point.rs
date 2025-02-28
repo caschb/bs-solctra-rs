@@ -5,7 +5,7 @@ use std::error::Error;
 use std::path::{Path, PathBuf};
 
 #[derive(Debug, Default, PartialEq, Clone, Copy, serde::Deserialize, serde::Serialize)]
-pub(crate) struct Point {
+pub struct Point {
     pub(crate) x: f64,
     pub(crate) y: f64,
     pub(crate) z: f64,
@@ -45,7 +45,7 @@ impl fmt::Display for Point {
     }
 }
 
-pub(crate) fn read_from_file(path: &Path, max_items: usize) -> Result<Vec<Point>, Box<dyn Error>> {
+pub fn read_from_file(path: &Path, max_items: usize) -> Result<Vec<Point>, Box<dyn Error>> {
     debug!("Reading data from file {:?}", path);
     let mut rdr = csv::Reader::from_path(path)?;
     let mut points = Vec::<Point>::new();
@@ -57,7 +57,7 @@ pub(crate) fn read_from_file(path: &Path, max_items: usize) -> Result<Vec<Point>
     return Ok(points);
 }
 
-pub(crate) fn write_points_to_file(
+pub fn write_points_to_file(
     points: &[Point],
     output_dir: &Path,
     step: u32,
@@ -70,4 +70,31 @@ pub(crate) fn write_points_to_file(
         wtr.serialize(point)?;
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn norm_of_origin_point() {
+        let point = Point {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        };
+        let result = point.get_norm();
+        assert_eq!(result, 0.0);
+    }
+
+    #[test]
+    fn representation_of_point() {
+        let point = Point {
+            x: 3.3,
+            y: 4.4,
+            z: 5.5,
+        };
+        let result = point.to_string();
+        assert_eq!(result, "3.3,4.4,5.5")
+    }
 }

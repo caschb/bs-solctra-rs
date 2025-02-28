@@ -1,12 +1,13 @@
 use clap::Parser;
 use log::{debug, info, trace};
-use point::read_from_file;
-use std::{fs::{self, DirBuilder}, path::Path};
+use std::{
+    fs::{self, DirBuilder},
+    path::Path,
+};
 
-mod args;
-mod constants;
-mod point;
-mod simulation;
+use bs_solctra_rs::args;
+use bs_solctra_rs::point;
+use bs_solctra_rs::simulation;
 
 fn create_directory(path: &Path) {
     let dirbuilder = DirBuilder::new();
@@ -31,13 +32,14 @@ fn main() {
     }
     info!("Reading particles from file {}", args.particles_file);
     let max_particles = args.num_particles;
-    let mut particles = match read_from_file(Path::new(&args.particles_file), max_particles) {
+    let mut particles = match point::read_from_file(Path::new(&args.particles_file), max_particles)
+    {
         Ok(particles) => particles,
         Err(err) => panic!("Error: {}", err),
     };
 
     info!("Reading coil data from directory: {}", &args.resource_path);
-    let coils = match simulation::read_coil_data_directory(Path::new(&args.resource_path)){
+    let coils = match simulation::read_coil_data_directory(Path::new(&args.resource_path)) {
         Ok(coils) => coils,
         Err(err) => panic!("Error: {}", err),
     };
