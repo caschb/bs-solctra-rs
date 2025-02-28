@@ -6,10 +6,6 @@ use clap::error::Result;
 use log::debug;
 use std::{error::Error, fs, io, path::Path, usize};
 
-pub fn add_one(other: u32) -> u32 {
-    other + 1
-}
-
 pub fn compute_magnetic_field(
     particle: &Point,
     coils: &Vec<Vec<Point>>,
@@ -132,6 +128,7 @@ pub fn simulate_particles(
     displacements: &Vec<Vec<Point>>,
     e_roof: &Vec<Vec<Point>>,
     output_dir: &Path,
+    write_frequency: u32,
 ) {
     let length = particles.len();
     let divergent_particle = Point {
@@ -154,7 +151,7 @@ pub fn simulate_particles(
                 *particle = simulate_step(particle, coils, displacements, e_roof, step_size);
             }
         }
-        if step % 10 == 0 {
+        if step % write_frequency == 0 {
             match write_points_to_file(&particles, output_dir, step) {
                 Ok(_) => debug!("Wrote points to {:?}", output_dir),
                 Err(error) => panic!("Error writing points to file. {}", error),

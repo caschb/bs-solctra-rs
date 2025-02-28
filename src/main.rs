@@ -1,20 +1,12 @@
 use clap::Parser;
 use log::{debug, info, trace};
 use std::{
-    fs::{self, DirBuilder},
+    fs::{self},
     path::Path,
 };
 
-use bs_solctra_rs::{args, point, simulation};
+use bs_solctra_rs::{args, point, simulation, utils};
 
-fn create_directory(path: &Path) {
-    let dirbuilder = DirBuilder::new();
-    info!("Creating path: {}", path.display());
-    match dirbuilder.create(path) {
-        Ok(_) => debug!("Succesfully created directory: {}", path.display()),
-        Err(_) => todo!(),
-    }
-}
 
 fn main() {
     env_logger::init();
@@ -25,7 +17,7 @@ fn main() {
 
     match fs::exists(output_dir) {
         Ok(true) => info!("Output path: {} already exists", args.output),
-        Ok(false) => create_directory(output_dir),
+        Ok(false) => utils::create_directory(output_dir),
         Err(err) => panic!("Error querying path: {}", err),
     }
     info!("Reading particles from file {}", args.particles_file);
@@ -57,5 +49,6 @@ fn main() {
         &displacements,
         &e_roof,
         output_dir,
+        args.write_frequency
     );
 }

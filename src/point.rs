@@ -6,9 +6,9 @@ use std::path::{Path, PathBuf};
 
 #[derive(Debug, Default, PartialEq, Clone, Copy, serde::Deserialize, serde::Serialize)]
 pub struct Point {
-    pub(crate) x: f64,
-    pub(crate) y: f64,
-    pub(crate) z: f64,
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
 }
 
 impl Point {

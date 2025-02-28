@@ -50,4 +50,8 @@ pub struct Args {
     /// Output directory
     #[arg(short, long)]
     pub output: String,
+
+    /// How often to write output files
+    #[arg(short, default_value_t = 10)]
+    pub write_frequency: u32,
 }
