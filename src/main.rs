@@ -5,9 +5,7 @@ use std::{
     path::Path,
 };
 
-use bs_solctra_rs::args;
-use bs_solctra_rs::point;
-use bs_solctra_rs::simulation;
+use bs_solctra_rs::{args, point, simulation};
 
 fn create_directory(path: &Path) {
     let dirbuilder = DirBuilder::new();
@@ -28,7 +26,7 @@ fn main() {
     match fs::exists(output_dir) {
         Ok(true) => info!("Output path: {} already exists", args.output),
         Ok(false) => create_directory(output_dir),
-        Err(_) => panic!("Error querying path"),
+        Err(err) => panic!("Error querying path: {}", err),
     }
     info!("Reading particles from file {}", args.particles_file);
     let max_particles = args.num_particles;
