@@ -1,6 +1,6 @@
 use crate::{
     constants::{I, MAJOR_RADIUS, MINOR_RADIUS, MIU, PI},
-    point::{Point, read_from_file, write_points_to_file},
+    point::{read_from_file, write_points_to_file, Point},
 };
 use clap::error::Result;
 use log::debug;

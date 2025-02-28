@@ -7,7 +7,6 @@ use std::{
 
 use bs_solctra_rs::{args, point, simulation, utils};
 
-
 fn main() {
     env_logger::init();
     info!("Starting BS-Solctra");
@@ -49,6 +48,6 @@ fn main() {
         &displacements,
         &e_roof,
         output_dir,
-        args.write_frequency
+        args.write_frequency,
     );
 }

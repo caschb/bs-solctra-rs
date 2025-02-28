@@ -1,6 +1,6 @@
+use log::{debug, info};
 use std::fs::DirBuilder;
 use std::path::Path;
-use log::{debug, info};
 
 pub fn create_directory(path: &Path) {
     let dirbuilder = DirBuilder::new();
